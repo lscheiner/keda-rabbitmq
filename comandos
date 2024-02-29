@@ -1,0 +1,23 @@
+microk8s kubectl get all --all-namespaces
+
+
+
+microk8s kubectl apply -f deploy-java-rabbit.yaml
+
+list deploys
+
+microk8s kubectl get pods --namespace=java-rabbit
+
+logs
+
+microk8s kubectl logs keda-java-rabbit-ccc5c956c-phkfh --namespace=java-rabbit
+
+refresh certificado
+
+refresh-certs --cert ca.crt
+
+/var/snap/microk8s/current/certs/csr.conf.template
+
+token=$(microk8s kubectl -n kube-system get secret | grep default-token | cut -d " " -f1)
+microk8s kubectl -n kube-system describe secret $token
+

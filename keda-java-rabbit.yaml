@@ -1,0 +1,21 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: java-rabbitmq-scaledobject
+  namespace: java-rabbit
+spec:
+  scaleTargetRef:
+    name: keda-java-rabbit  # nome do deployment onde esta o container 
+                              # a ser executado pela trigger
+  minReplicaCount: 0  # número mínimo de réplicas que deverão ficar no ar
+  maxReplicaCount: 10 # número máximo de réplicas que deverão ficar no ar
+  pollingInterval: 5  # intervalo entre um check e outro no Rabbit
+  cooldownPeriod: 30  # tempo em segundos que os pods ficarão no ar 
+                      # depois que a checagem retornar 0 msg na fila
+  triggers:
+  - type: rabbitmq
+    metadata:
+      host: "http://guest:guest@10.0.1.128:15672"
+      queueLength: '20' 
+      queueName: teste
+      includeUnacked: 'true'

@@ -1,0 +1,4 @@
+br\com\scheiner\rabbitmq\app\TesteController.class
+br\com\scheiner\rabbitmq\app\Consumer.class
+br\com\scheiner\rabbitmq\app\RabbitMQConfig.class
+br\com\scheiner\rabbitmq\app\AppApplication.class
