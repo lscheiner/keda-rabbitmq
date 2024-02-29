@@ -1,0 +1,103 @@
+interface grafica do rabbitt
+
+http://localhost:15672/#/
+
+
+vboxuser
+changeme
+
+sudo snap restart microk8s
+---------------------------------------------------------------------------------------------
+
+instalar o microk8s usando ubuntu 22.04
+
+sudo snap install microk8s --classic
+
+
+rodar os seguintes comandos:
+
+microk8s enable dns 
+microk8s enable dashboard
+microk8s enable storage
+
+---- comandos kubernetes -----------------------------------------------
+
+microk8s kubectl get all --all-namespaces
+
+LOCALIZAR O IP DO DASHBOARD
+
+PAINEL DO KUBERNETES gerar token
+
+token=$(microk8s kubectl -n kube-system get secret | grep default-token | cut -d " " -f1)
+microk8s kubectl -n kube-system describe secret $token
+
+instalar o keda
+
+microk8s enable community
+microk8s enable keda
+
+---------------------------------------------------------------------------------------------
+docker run -d --hostname scheiner-rabbit --name some-rabbit -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+
+senha e user : guest
+
+---------------------------------------------------------------------------
+criar um docker file
+
+FROM openjdk:17
+COPY target/rabbitmq-0.0.1-SNAPSHOT.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","/app.jar"]
+
+----------------------------------------------------------------------------
+
+publicar imagem
+
+docker image build -t scheiner-rabbitmq .
+
+docker tag scheiner-rabbitmq lscheiner/scheiner-rabbitmq:latest
+
+docker push  lscheiner/scheiner-rabbitmq:latest                -- tag se chama latest
+
+baixar imagem
+
+docker pull lscheiner/scheiner-rabbitmq
+
+rodar
+docker run  -p 8080:8080 scheiner-rabbitmq 
+
+kubectl create namespace java-rabbit
+
+deploy 
+
+tail log 
+
+microk8s kubectl logs -f -l app=keda-python-rabbit
+
+latest versao com -- setPrefetchCount 250
+v1 versao com -- setPrefetchCount 10
+
+-----------------------------------------------------
+
+microk8s kubectl get all --all-namespaces
+
+microk8s kubectl apply -f deploy-java-rabbit.yaml
+
+-- list deploys
+
+microk8s kubectl get pods --namespace=java-rabbit
+
+-- logs
+
+microk8s kubectl logs keda-java-rabbit-ccc5c956c-phkfh --namespace=java-rabbit
+
+--- refresh certificado
+
+refresh-certs --cert ca.crt
+
+/var/snap/microk8s/current/certs/csr.conf.template
+
+token=$(microk8s kubectl -n kube-system get secret | grep default-token | cut -d " " -f1)
+microk8s kubectl -n kube-system describe secret $token
+
+
