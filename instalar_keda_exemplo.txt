@@ -40,9 +40,13 @@ helm install dashboard kubernetes-dashboard/kubernetes-dashboard -n kubernetes-d
 iniciar dash-board
 
 kubectl proxy
+
 link:
 http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:dashboard-kubernetes-dashboard:https/proxy/#/login
 
+sobre o dashboard
+
+https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/
 
 criar um ServiceAccount 
 
@@ -67,6 +71,7 @@ subjects:
   namespace: kubernetes-dashboard
 
 aplicar:  kubectl apply -f service-account.yaml
+
 gerar token 
 
 kubectl -n kubernetes-dashboard create token admin-user
@@ -112,13 +117,13 @@ publicar imagem
 
 docker image build -t scheiner-rabbitmq .
 
-docker tag scheiner-rabbitmq lscheiner/scheiner-rabbitmq:latest
+docker tag scheiner-rabbitmq lscheiner/scheiner-rabbitmq:v1
 
-docker push lscheiner/scheiner-rabbitmq:latest                -- tag se chama latest
+docker push lscheiner/scheiner-rabbitmq:v1                -- tag se chama v1
 
 baixar imagem
 
-docker pull lscheiner/scheiner-rabbitmq
+docker pull lscheiner/scheiner-rabbitmq:v1
 
 rodar
 docker run  -p 8080:8080 scheiner-rabbitmq 
@@ -127,7 +132,6 @@ kubectl create namespace java-rabbit  -- criar namespace
 
 versões do docker
 
-latest versao com -- setPrefetchCount 250
 v1 versao com -- setPrefetchCount 10
 
 -----------------COMANDOS------------------------------------
@@ -143,6 +147,10 @@ microk8s kubectl apply -f deploy-java-rabbit.yaml
 -- list deploys
 
 microk8s kubectl get pods --namespace=java-rabbit
+
+kubectl describe pod
+
+kubectl describe pod keda-java-rabbit-59f47dbb47-2vzqd --namespace=java-rabbit
 
 -- logs
 
