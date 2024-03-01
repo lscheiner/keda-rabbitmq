@@ -19,5 +19,9 @@ spec:
         image: lscheiner/scheiner-rabbitmq
         imagePullPolicy: Always
         ports:
-        - containerPort: 80
+        - containerPort: 8080
+      hostAliases:
+      - ip: "10.0.1.128"
+        hostnames:
+        - "rabbitmq.lab.local"           
 

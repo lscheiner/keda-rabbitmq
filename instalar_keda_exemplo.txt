@@ -2,6 +2,7 @@ interface grafica do rabbitt
 
 http://localhost:15672/#/
 
+rabbitmq.lab.local - configurado no arquivo de deploy, que aponta para meu IP local
 
 vboxuser
 changeme
@@ -14,8 +15,10 @@ instalar o microk8s usando ubuntu 22.04
 sudo snap install microk8s --classic
 
 
-rodar os seguintes comandos:
+instalar no microk8s
 
+microk8s enable community
+microk8s enable keda
 microk8s enable dns 
 microk8s enable dashboard
 microk8s enable storage
@@ -31,17 +34,16 @@ PAINEL DO KUBERNETES gerar token
 token=$(microk8s kubectl -n kube-system get secret | grep default-token | cut -d " " -f1)
 microk8s kubectl -n kube-system describe secret $token
 
-instalar o keda
-
-microk8s enable community
-microk8s enable keda
-
 ---------------------------------------------------------------------------------------------
+rodar o rabbitmq
+
 docker run -d --hostname scheiner-rabbit --name some-rabbit -p 5672:5672 -p 15672:15672 rabbitmq:3-management
 
 senha e user : guest
 
 ---------------------------------------------------------------------------
+JAVA
+
 criar um docker file
 
 FROM openjdk:17
@@ -57,7 +59,7 @@ docker image build -t scheiner-rabbitmq .
 
 docker tag scheiner-rabbitmq lscheiner/scheiner-rabbitmq:latest
 
-docker push  lscheiner/scheiner-rabbitmq:latest                -- tag se chama latest
+docker push lscheiner/scheiner-rabbitmq:latest                -- tag se chama latest
 
 baixar imagem
 
@@ -66,22 +68,22 @@ docker pull lscheiner/scheiner-rabbitmq
 rodar
 docker run  -p 8080:8080 scheiner-rabbitmq 
 
-kubectl create namespace java-rabbit
+kubectl create namespace java-rabbit  -- criar namespace
 
-deploy 
-
-tail log 
-
-microk8s kubectl logs -f -l app=keda-python-rabbit
+versões do docker
 
 latest versao com -- setPrefetchCount 250
 v1 versao com -- setPrefetchCount 10
 
------------------------------------------------------
+-----------------COMANDOS------------------------------------
 
 microk8s kubectl get all --all-namespaces
 
 microk8s kubectl apply -f deploy-java-rabbit.yaml
+--- kuberntes
+
+ microk8s kubectl get nodes -o wide
+
 
 -- list deploys
 
@@ -90,14 +92,16 @@ microk8s kubectl get pods --namespace=java-rabbit
 -- logs
 
 microk8s kubectl logs keda-java-rabbit-ccc5c956c-phkfh --namespace=java-rabbit
+microk8s kubectl logs -f -l app=keda-java-rabbit --namespace=java-rabbit
 
 --- refresh certificado
 
 refresh-certs --cert ca.crt
 
-/var/snap/microk8s/current/certs/csr.conf.template
+/var/snap/microk8s/current/certs/csr.conf.template -- editar o arquivo colocando o IP novo exemplo IP.100 = 10.0.1.12 -- fazer refresh do certificado
 
-token=$(microk8s kubectl -n kube-system get secret | grep default-token | cut -d " " -f1)
-microk8s kubectl -n kube-system describe secret $token
+expor o servico
+
+kubectl expose deployment keda-java-rabbit --type=LoadBalancer --name=keda-java-rabbit-service
 
 

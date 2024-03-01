@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Configuration;
 @EnableRabbit
 public class RabbitMQConfig {
 
-
     @Bean
     public Queue testeQueue() {
         return new Queue("teste", true);

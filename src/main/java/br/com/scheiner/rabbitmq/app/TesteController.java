@@ -10,13 +10,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 @RestController
 @RequestMapping("/mensagem/{quantidade}")
 public class TesteController {
-
-    public TesteController(AmqpTemplate queueSender) {
-        this.queueSender = queueSender;
-    }
 
     private final AmqpTemplate queueSender;
 
@@ -34,7 +33,6 @@ public class TesteController {
             queueSender.convertAndSend("teste-exchange", "teste-routing-key", message);
     	}
     	
-        
         return "sucesso";
     }
 
