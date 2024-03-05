@@ -167,4 +167,16 @@ expor o servico
 
 kubectl expose deployment keda-java-rabbit --type=LoadBalancer --name=keda-java-rabbit-service
 
+-- instalar certificado -- 
+
+
+extrair a CA - pode usar o chrome
+
+kubectl create secret generic proxy-certificate --from-file=proxy.crt=proxy.crt
+
+no linux
+
+proxy.crt /usr/local/share/ca-certificates
+update-ca-certificates
+
 

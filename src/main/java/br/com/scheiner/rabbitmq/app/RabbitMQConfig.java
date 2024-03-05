@@ -34,7 +34,8 @@ public class RabbitMQConfig {
     public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
-        factory.setPrefetchCount(10); // quantas mensagens o servidor pode enviar para um consumidor antes de esperar por uma confirmação de processamento. 
+        factory.setPrefetchCount(20); // quantas mensagens o servidor pode enviar para um consumidor antes de esperar por uma confirmação de processamento. 
+		factory.setContainerCustomizer(c -> c.setShutdownTimeout(60_000L)); // aguardar para o shutdown do consumer
         return factory;
     }
 

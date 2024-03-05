@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keda-java-rabbit
+  namespace: java-rabbit
+  labels:
+    app: keda-java-rabbit
+spec:
+  selector:
+    matchLabels:
+      app: keda-java-rabbit
+  template:
+    metadata:
+      labels:
+        app: keda-java-rabbit
+    spec:
+      containers:
+      - name: service
+        image: lscheiner/scheiner-rabbitmq:v2
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 10
+          timeoutSeconds: 1
+          periodSeconds: 10
+          successThreshold: 1
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+          periodSeconds: 10
+          successThreshold: 1
+          failureThreshold: 3               
+        ports:
+        - containerPort: 8080
+      hostAliases:
+      - ip: "10.0.1.128"
+        hostnames:
+        - "rabbitmq.lab.local"         
+
