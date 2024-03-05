@@ -14,12 +14,12 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/mensagem/{quantidade}")
+@RequestMapping
 public class TesteController {
 
     private final AmqpTemplate queueSender;
 
-    @GetMapping
+    @GetMapping("/mensagem/{quantidade}/teste")
     public String send(@PathVariable Integer quantidade){
 
     	for (int i = 0; i < quantidade ; i++) {
@@ -31,6 +31,24 @@ public class TesteController {
     		MessageConverter messageConverter = new SimpleMessageConverter();
     		Message message = messageConverter.toMessage(mensagem, messageProperties);
             queueSender.convertAndSend("teste-exchange", "teste-routing-key", message);
+    	}
+    	
+        return "sucesso";
+    }
+    
+    
+    @GetMapping("/mensagem/{quantidade}/teste1")
+    public String send1(@PathVariable Integer quantidade){
+
+    	for (int i = 0; i < quantidade ; i++) {
+    		
+    		String mensagem = "testando mensagem";
+
+            MessageProperties messageProperties = new MessageProperties();
+    		messageProperties.setHeader("header-teste", "testando header");
+    		MessageConverter messageConverter = new SimpleMessageConverter();
+    		Message message = messageConverter.toMessage(mensagem, messageProperties);
+            queueSender.convertAndSend("teste-exchange", "teste1-routing-key", message);
     	}
     	
         return "sucesso";

@@ -20,3 +20,10 @@ spec:
       vhostName: /
       queueLength: '20' 
       queueName: teste
+  - type: rabbitmq
+    metadata:
+      host: "amqp://guest:guest@10.0.1.128:5672"
+      protocol: amqp
+      vhostName: /
+      queueLength: '20' 
+      queueName: teste1      
