@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class Consumer {
 	
-    @RabbitListener(queues = {"${queue.name}"})
+   @RabbitListener(queues = {"${queue.name}"})
     public void receive(@Payload Message<String> message) {
         try {
         	
