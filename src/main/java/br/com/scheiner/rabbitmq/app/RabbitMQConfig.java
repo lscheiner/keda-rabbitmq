@@ -16,6 +16,12 @@ import org.springframework.retry.support.RetryTemplate;
 @Configuration
 public class RabbitMQConfig {
     
+    public static final String BASE_QUEUE = "scheiner-messages-";
+    public static final String KEY = ".key";
+    public static final String DLQ = ".dlq";
+    public static final String BINDING = ".binding";
+
+	
     public static final String EXCHANGE_MESSAGES = "scheiner-messages-exchange";
     public static final String EXCHANGE_MESSAGES_DLX = "scheiner-messages-exchange.dlx";
 

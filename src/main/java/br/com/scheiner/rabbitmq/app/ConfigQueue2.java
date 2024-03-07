@@ -11,30 +11,32 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ConfigQueue2 {
 
-	public static final String QUEUE_MESSAGES_KEY = "scheiner-messages-queue2.key";
-	
-    public static final String QUEUE_MESSAGES = "scheiner-messages-queue2";
-    public static final String QUEUE_MESSAGES_DLQ = QUEUE_MESSAGES + ".dlq";
-	
-	@Bean
-	Queue messagesQueue2() {
+    private static final String NAME = "queue2";
+
+    public static final String QUEUE_MESSAGES = RabbitMQConfig.BASE_QUEUE + NAME;
+	public static final String QUEUE_MESSAGES_KEY = QUEUE_MESSAGES + RabbitMQConfig.KEY;
+    public static final String QUEUE_MESSAGES_DLQ = QUEUE_MESSAGES + RabbitMQConfig.DLQ;
+
+	@Bean(QUEUE_MESSAGES)
+	Queue messagesQueue() {
 	    return QueueBuilder.durable(QUEUE_MESSAGES)
 	      .withArgument("x-dead-letter-exchange", RabbitMQConfig.EXCHANGE_MESSAGES_DLX)
 	      .build();
 	}
-	 
-	@Bean
-	Queue messagesQueue2Dlq() {
+	
+	@Bean(QUEUE_MESSAGES_DLQ)
+	Queue messagesQueueDlq() {
 	    return QueueBuilder.durable(QUEUE_MESSAGES_DLQ).build();
 	}
 	
-    @Bean
-    Binding bindingMessages2(TopicExchange messagesExchange) {
-        return BindingBuilder.bind(messagesQueue2()).to(messagesExchange).with(QUEUE_MESSAGES_KEY);
+	@Bean(QUEUE_MESSAGES + RabbitMQConfig.BINDING)
+    Binding bindingMessages(TopicExchange messagesExchange) {
+        return BindingBuilder.bind(messagesQueue()).to(messagesExchange).with(QUEUE_MESSAGES_KEY);
     }
     
-    @Bean
-    Binding bindingMessagesDlq2(TopicExchange messagesExchangeDlx) {
-        return BindingBuilder.bind(messagesQueue2Dlq()).to(messagesExchangeDlx).with(QUEUE_MESSAGES_KEY);
+	@Bean(QUEUE_MESSAGES_DLQ + RabbitMQConfig.BINDING)
+    Binding bindingMessagesDlq(TopicExchange messagesExchangeDlx) {
+        return BindingBuilder.bind(messagesQueueDlq()).to(messagesExchangeDlx).with(QUEUE_MESSAGES_KEY);
     }
+
 }

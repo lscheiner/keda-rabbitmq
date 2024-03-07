@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class CustomMessageRecoverer extends RepublishMessageRecoverer {
 
-	private static final String KEY = ".key";
 	
 	public CustomMessageRecoverer(RabbitTemplate errorTemplate) {
 		super(errorTemplate , RabbitMQConfig.EXCHANGE_MESSAGES_DLX);
@@ -18,8 +17,8 @@ public class CustomMessageRecoverer extends RepublishMessageRecoverer {
 	@Override
 	protected void doSend(String exchange, String routingKey, Message message) {
 
-		if (!routingKey.endsWith(KEY)) {
-			routingKey = routingKey.concat(KEY);
+		if (!routingKey.endsWith(RabbitMQConfig.KEY)) {
+			routingKey = routingKey.concat(RabbitMQConfig.KEY);
 		}
 		
 		super.doSend(exchange, routingKey, message);
