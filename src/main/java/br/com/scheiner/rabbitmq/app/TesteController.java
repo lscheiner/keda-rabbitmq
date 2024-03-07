@@ -17,7 +17,7 @@ public class TesteController {
     @GetMapping("/mensagem/{quantidade}/teste")
     public String send(@PathVariable Integer quantidade){
     	
-    	this.producer.send(quantidade, "teste-routing-key");
+    	this.producer.send(quantidade, ConfigQueue1.QUEUE_MESSAGES_KEY);
     
         return "sucesso";
     }
@@ -26,7 +26,7 @@ public class TesteController {
     @GetMapping("/mensagem/{quantidade}/teste1")
     public String send1(@PathVariable Integer quantidade){
 
-    	this.producer.send(quantidade, "teste1-routing-key");
+    	this.producer.send(quantidade, ConfigQueue2.QUEUE_MESSAGES_KEY);
     	
         return "sucesso";
     }

@@ -33,7 +33,7 @@ public class Producer {
     		messageProperties.setHeader("header-teste", "testando header");
     		MessageConverter messageConverter = new SimpleMessageConverter();
     		Message message = messageConverter.toMessage(mensagem, messageProperties);
-			queueSender.convertAndSend("teste-exchange", routingKey, message);
+			queueSender.convertAndSend(RabbitMQConfig.EXCHANGE_MESSAGES, routingKey, message);
     	}
     }
     

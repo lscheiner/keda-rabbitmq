@@ -1,51 +1,64 @@
 package br.com.scheiner.rabbitmq.app;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.rabbit.annotation.EnableRabbit;
+import org.aopalliance.aop.Advice;
+import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.rabbit.config.RetryInterceptorBuilder;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.backoff.FixedBackOffPolicy;
+import org.springframework.retry.interceptor.RetryOperationsInterceptor;
+import org.springframework.retry.policy.SimpleRetryPolicy;
+import org.springframework.retry.support.RetryTemplate;
 
 
 @Configuration
-@EnableRabbit
 public class RabbitMQConfig {
+    
+    public static final String EXCHANGE_MESSAGES = "scheiner-messages-exchange";
+    public static final String EXCHANGE_MESSAGES_DLX = "scheiner-messages-exchange.dlx";
 
     @Bean
-    public Queue testeQueue() {
-        return new Queue("teste", true);
+    TopicExchange messagesExchange() {
+        return new TopicExchange(EXCHANGE_MESSAGES);
     }
     
     @Bean
-    public Queue testeQueue1() {
-        return new Queue("teste1", true);
+    TopicExchange messagesExchangeDlx() {
+        return new TopicExchange(EXCHANGE_MESSAGES_DLX);
     }
-
-    @Bean
-    DirectExchange exchange() {
-        return new DirectExchange("teste-exchange");
-    }
-
-    @Bean
-    Binding testeBinding(Queue testeQueue, DirectExchange exchange) {
-        return BindingBuilder.bind(testeQueue).to(exchange).with("teste-routing-key");
+    
+    
+    private RetryTemplate retryTemplate() {
+        RetryTemplate retryTemplate = new RetryTemplate();
+        retryTemplate.setRetryPolicy(new SimpleRetryPolicy(3));
+        FixedBackOffPolicy backOffPolicy = new FixedBackOffPolicy();
+        backOffPolicy.setBackOffPeriod(5000);
+        retryTemplate.setBackOffPolicy(backOffPolicy);
+        return retryTemplate;
     }
     
     @Bean
-    Binding testeBinding1(Queue testeQueue1, DirectExchange exchange) {
-        return BindingBuilder.bind(testeQueue1).to(exchange).with("teste1-routing-key");
+    public RetryOperationsInterceptor rabbitSourceRetryInterceptor(CustomMessageRecoverer customMessageRecoverer) {
+      return RetryInterceptorBuilder.stateless()
+          .recoverer(customMessageRecoverer)
+          .retryOperations(retryTemplate())
+          .build();
     }
-
+    
+    
     @Bean
-    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
+    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory , RetryOperationsInterceptor retryOperationsInterceptor ) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+
+		Advice[] adviceChain = { retryOperationsInterceptor };  // configuracao retry
+		factory.setAdviceChain(adviceChain);
+
         factory.setConnectionFactory(connectionFactory);
         factory.setPrefetchCount(20); // quantas mensagens o servidor pode enviar para um consumidor antes de esperar por uma confirmação de processamento. 
 		factory.setContainerCustomizer(c -> c.setShutdownTimeout(60_000L)); // aguardar para o shutdown do consumer
+		factory.setContainerCustomizer(c -> c.setDefaultRequeueRejected(false)); // não respostar a mensagem
         return factory;
     }
 
