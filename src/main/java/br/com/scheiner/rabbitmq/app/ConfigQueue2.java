@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
 public class ConfigQueue2 {
 
 	public static final String QUEUE_MESSAGES_KEY = "scheiner-messages-queue2.key";
-	public static final String QUEUE_MESSAGES_KEY_DQL = "scheiner-messages-queue2.key";
 	
     public static final String QUEUE_MESSAGES = "scheiner-messages-queue2";
     public static final String QUEUE_MESSAGES_DLQ = QUEUE_MESSAGES + ".dlq";
@@ -36,6 +35,6 @@ public class ConfigQueue2 {
     
     @Bean
     Binding bindingMessagesDlq2(TopicExchange messagesExchangeDlx) {
-        return BindingBuilder.bind(messagesQueue2Dlq()).to(messagesExchangeDlx).with(QUEUE_MESSAGES_KEY_DQL);
+        return BindingBuilder.bind(messagesQueue2Dlq()).to(messagesExchangeDlx).with(QUEUE_MESSAGES_KEY);
     }
 }
