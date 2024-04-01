@@ -1,0 +1,18 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: workload-scaledobject
+  namespace: java-rabbit
+spec:
+  scaleTargetRef:
+    name: scheiner-exemplo-pod
+  minReplicaCount: 0  # número mínimo de réplicas que deverão ficar no ar
+  maxReplicaCount: 10 # número máximo de réplicas que deverão ficar no ar
+  pollingInterval: 5  # intervalo entre um check e outro no Rabbit
+  cooldownPeriod: 30  # tempo em segundos que os pods ficarão no ar 
+                      # depois que a checagem retornar 0 msg na fila
+  triggers:
+  - type: kubernetes-workload
+    metadata:
+      podSelector: 'app=keda-java-rabbit'
+      value: '0.5'
